@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/_layout :: head(#{app.title})}"></head>
+<body>
+<nav th:replace="~{fragments/_layout :: navbar}"></nav>
+
+<main th:replace="~{fragments/_layout :: content}">
+    <div class="container my-4">
+        <div class="p-4 bg-white rounded shadow-sm">
+            <h1 class="mb-3" th:text="#{app.welcome}">Bem-vindo ao MotoTrack</h1>
+            <p class="text-secondary" th:text="#{app.intro}">Gerencie filiais, motos, sensores e localizações.</p>
+            <div class="d-flex gap-2 flex-wrap">
+                <a class="btn btn-primary" th:href="@{/filiais}" th:text="#{menu.filiais}">Filiais</a>
+                <a class="btn btn-primary" th:href="@{/motos}" th:text="#{menu.motos}">Motos</a>
+                <a class="btn btn-primary" th:href="@{/sensores}" th:text="#{menu.sensores}">Sensores</a>
+                <a class="btn btn-primary" th:href="@{/localizacoes}" th:text="#{menu.localizacoes}">Localizações</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/_layout :: footer}"></footer>
+</body>
+</html>

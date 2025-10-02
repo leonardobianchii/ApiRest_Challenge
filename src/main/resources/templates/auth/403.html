@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="#{auth.403.title}">Acesso negado</title>
+  <link th:href="@{/webjars/bootstrap/5.3.3/dist/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div th:insert="~{fragments/header :: header}"></div>
+<div th:insert="~{fragments/navbar :: navbar}"></div>
+
+<div class="container py-5">
+  <div class="alert alert-warning shadow-sm">
+    <h4 class="alert-heading" th:text="#{auth.403.title}">Acesso negado</h4>
+    <p th:text="#{auth.403.msg}">Você não tem permissão para acessar esta página.</p>
+    <hr>
+    <a class="btn btn-secondary" th:href="@{/web/motos}" th:text="#{nav.back}">Voltar</a>
+    <a class="btn btn-outline-danger" th:href="@{/logout}" th:text="#{auth.logout}">Sair</a>
+  </div>
+</div>
+
+<div th:insert="~{fragments/footer :: footer}"></div>
+<script th:src="@{/webjars/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

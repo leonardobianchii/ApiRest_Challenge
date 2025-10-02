@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<body th:fragment="navbar">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}" th:text="#{app.brand}">Mottu Monitor</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div id="topbar" class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" th:href="@{/}" th:text="#{menu.home}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/motos}" th:text="#{menu.motos}">Motos</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/filiais}" th:text="#{menu.filiais}">Filiais</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/sensores}" th:text="#{menu.sensores}">Sensores</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/localizacoes}" th:text="#{menu.localizacoes}">Localizações</a></li>
+            </ul>
+
+            <form th:action="@{/logout}" method="post" class="d-flex">
+                <button class="btn btn-outline-light btn-sm" type="submit">Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# ===== Configuração principal =====
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@//oracle.fiap.com.br:1521/ORCL
+    username: rm558576
+    password: fiap24
+    driver-class-name: oracle.jdbc.OracleDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:database/migration/oracle
+    oracle:
+      sqlplus: true

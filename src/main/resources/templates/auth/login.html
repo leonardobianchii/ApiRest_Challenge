@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entrar na plataforma</title>
+
+    <!-- Bootstrap pelo WebJars -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-light d-flex align-items-center min-vh-100">
+
+<main class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-8 col-md-5 col-lg-4">
+            <div class="card shadow-sm login-card">
+                <div class="card-body p-4">
+                    <h1 class="h4 mb-4 text-center">Entrar na plataforma</h1>
+
+                    <div th:if="${param.error}" class="alert alert-danger">
+                        Usuário ou senha inválidos.
+                    </div>
+                    <div th:if="${param.logout}" class="alert alert-success">
+                        Sessão encerrada com sucesso.
+                    </div>
+
+                    <form th:action="@{/login}" method="post" class="needs-validation" novalidate>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="username">Usuário</label>
+                            <input id="username" name="username" type="text" class="form-control" required autofocus>
+                            <div class="invalid-feedback">Campo obrigatório</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="password">Senha</label>
+                            <input id="password" name="password" type="password" class="form-control" required>
+                            <div class="invalid-feedback">Campo obrigatório</div>
+                        </div>
+
+                        <button class="btn btn-primary w-100" type="submit">Entrar</button>
+                    </form>
+
+                    <p class="text-center text-muted mt-3 small">
+                        viewer/viewer123 • editor/editor123
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Bootstrap JS -->
+<script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script>
+    (() => {
+      'use strict';
+      const forms = document.querySelectorAll('.needs-validation');
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', e => {
+          if (!form.checkValidity()) { e.preventDefault(); e.stopPropagation(); }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })();
+</script>
+</body>
+</html>
