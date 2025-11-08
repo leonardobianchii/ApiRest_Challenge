@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: header(#{view.moto.tituloForm})}"></head>
+<body>
+
+<div th:replace="~{fragments/layout :: nav}"></div>
+
+<div class="container py-4">
+
+    <h1 class="h3 text-success mb-3" th:text="#{view.moto.tituloForm}">Cadastro de Moto</h1>
+
+    <form th:action="@{/view/motos/save}" th:object="${moto}" method="post"
+          class="row g-3 bg-light p-3 rounded border">
+
+        <!-- *{ } -->
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="col-md-3">
+            <label class="form-label" th:for="${#ids.next('placa')}" th:text="#{view.moto.placa}">Placa</label>
+            <input type="text" class="form-control" th:field="*{placa}" required maxlength="10">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label" th:for="${#ids.next('idModelo')}" th:text="#{view.moto.modelo}">Modelo(ID)</label>
+            <input type="number" class="form-control" th:field="*{idModelo}" required min="1">
+            <div class="form-text" th:text="#{view.moto.modeloHint}">Informe o ID de modelo existente</div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label" th:for="${#ids.next('idFilial')}" th:text="#{view.moto.filial}">Filial(ID)</label>
+            <input type="number" class="form-control" th:field="*{idFilial}" required min="1">
+            <div class="form-text" th:text="#{view.moto.filialHint}">Informe o ID da filial existente</div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label" th:for="${#ids.next('status')}" th:text="#{view.moto.status}">Status</label>
+            <input type="text" class="form-control" th:field="*{status}" maxlength="30">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label" th:for="${#ids.next('kmRodado')}" th:text="#{view.moto.km}">KM</label>
+            <input type="number" class="form-control" th:field="*{kmRodado}" min="0">
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+            <button type="submit" class="btn btn-success"
+                    th:text="${modoEdicao} ? #{view.salvar} : #{view.criar}">Salvar</button>
+            <a class="btn btn-outline-secondary" th:href="@{/view/motos}" th:text="#{view.voltar}">Voltar</a>
+        </div>
+    </form>
+
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

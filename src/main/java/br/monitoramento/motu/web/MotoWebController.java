@@ -1,8 +1,9 @@
 package br.monitoramento.motu.web;
 
-import br.monitoramento.motu.dto.MotoDTO;
+import br.monitoramento.motu.dto.MotoDto;
 import br.monitoramento.motu.service.MotoService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,75 +11,59 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/motos")
+@RequestMapping("/view/motos")
 public class MotoWebController {
 
-    private final MotoService motoService;
+    @Autowired
+    private MotoService motoService;
 
-    public MotoWebController(MotoService motoService) {
-        this.motoService = motoService;
-    }
-
+    // LISTA
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("motos", motoService.listarMotos());
-        return "motos/list";
+        model.addAttribute("motos", motoService.findAll());
+        return "moto/lista";
     }
 
-    @GetMapping("/novo")
+    // NOVO
+    @GetMapping("/new")
     public String createForm(Model model) {
-        model.addAttribute("moto", new MotoDTO());
-        // TODO (opcional): popular selects de modelo/filial quando você enviar os services
-        // model.addAttribute("modelos", modeloService.listarModelos());
-        // model.addAttribute("filiais", filialService.listarFiliais());
-        return "motos/form";
+        model.addAttribute("moto", new MotoDto(null, null, null, "", "", 0));
+        model.addAttribute("modoEdicao", false);
+        return "moto/form";
     }
 
-    @PostMapping
-    public String create(@Valid @ModelAttribute("moto") MotoDTO dto,
-                         BindingResult binding,
-                         RedirectAttributes ra,
-                         Model model) {
+    // EDITAR
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable("id") Integer id, Model model) {
+        model.addAttribute("moto", motoService.findById(id));
+        model.addAttribute("modoEdicao", true);
+        return "moto/form";
+    }
+
+    // SALVAR (CRIA/ATUALIZA)
+    @PostMapping("/save")
+    public String save(@Valid @ModelAttribute("moto") MotoDto moto,
+                       BindingResult binding,
+                       RedirectAttributes ra) {
         if (binding.hasErrors()) {
-
+            // volta para a mesma página com erros
+            return "moto/form";
         }
-        motoService.criarMoto(dto);
-        ra.addFlashAttribute("mensagemSucesso", "moto.salva.sucesso");
-        return "redirect:/motos";
+        if (moto.id() == null) {
+            motoService.create(moto);
+            ra.addFlashAttribute("msgSucesso", "view.moto.criada");
+        } else {
+            motoService.update(moto.id(), moto);
+            ra.addFlashAttribute("msgSucesso", "view.moto.atualizada");
+        }
+        return "redirect:/view/motos";
     }
 
-
-    @GetMapping("/{id}/editar")
-    public String editForm(@PathVariable("id") Long id, Model model, RedirectAttributes ra) {
-        try {
-            MotoDTO dto = motoService.obterMoto(id);
-            model.addAttribute("moto", dto);
-            return "motos/form";
-        } catch (RuntimeException ex) {
-            ra.addFlashAttribute("mensagemErro", "moto.nao.encontrada");
-            return "redirect:/motos";
-        }
-    }
-
-    @PostMapping("/{id}")
-    public String update(@PathVariable("id") Long id,
-                         @Valid @ModelAttribute("moto") MotoDTO dto,
-                         BindingResult binding,
-                         RedirectAttributes ra,
-                         Model model) {
-        if (binding.hasErrors()) {
-            // re-popular selects se você usar
-            return "motos/form";
-        }
-        motoService.atualizarMoto(id, dto);
-        ra.addFlashAttribute("mensagemSucesso", "moto.atualizada.sucesso");
-        return "redirect:/motos";
-    }
-
-    @PostMapping("/{id}/excluir")
-    public String delete(@PathVariable("id") Long id, RedirectAttributes ra) {
-        motoService.deletarMoto(id);
-        ra.addFlashAttribute("mensagemSucesso", "moto.excluida.sucesso");
-        return "redirect:/motos";
+    // DELETAR
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable("id") Integer id, RedirectAttributes ra) {
+        motoService.delete(id);
+        ra.addFlashAttribute("msgSucesso", "view.moto.excluida");
+        return "redirect:/view/motos";
     }
 }

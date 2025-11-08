@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: header(#{view.localizacao.tituloLista})}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 text-success" th:text="#{view.localizacao.tituloLista}">Localizacoes</h1>
+    <a class="btn btn-success" th:href="@{/view/localizacoes/new}" sec:authorize="hasRole('MOTO_EDIT')">
+      <i class="bi bi-plus-lg"></i> <span th:text="#{view.localizacao.nova}">Nova Localizacao</span>
+    </a>
+  </div>
+
+  <div th:if="${msgSucesso}" class="alert alert-success" th:text="#{__${msgSucesso}__}"></div>
+
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead class="table-success">
+      <tr>
+        <th th:text="#{view.localizacao.id}">ID</th>
+        <th th:text="#{view.localizacao.idMoto}">Moto(ID)</th>
+        <th th:text="#{view.localizacao.idSensor}">Sensor(ID)</th>
+        <th th:text="#{view.localizacao.dataHora}">Data/Hora</th>
+        <th th:text="#{view.acoes}" sec:authorize="hasRole('MOTO_EDIT')">Acoes</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="l : ${localizacoes}">
+        <td th:text="${l.id}">1</td>
+        <td th:text="${l.idMoto}">1</td>
+        <td th:text="${l.idSensor}">1</td>
+        <!-- usa o campo 'data' do DTO -->
+        <td th:text="${#temporals.format(l.data, 'dd/MM/yyyy HH:mm')}">01/01/2025 10:00</td>
+        <td class="d-flex gap-2" sec:authorize="hasRole('MOTO_EDIT')">
+          <a class="btn btn-sm btn-outline-success"
+             th:href="@{'/view/localizacoes/' + ${l.id} + '/edit'}"
+             th:text="#{view.editar}">Editar</a>
+          <form th:action="@{'/view/localizacoes/' + ${l.id} + '/delete'}" method="post"
+                th:attr="onsubmit=|return confirm('#{view.confirmarExclusao}')|">
+            <button class="btn btn-sm btn-outline-danger" type="submit" th:text="#{view.excluir}">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

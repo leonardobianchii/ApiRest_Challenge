@@ -1,44 +1,48 @@
 package br.monitoramento.motu.controller;
 
-import br.monitoramento.motu.dto.FilialDepartamentoDTO;
-import br.monitoramento.motu.service.FilialDepartamentoService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+
+import br.monitoramento.motu.service.FilialDepartamentoService;
+import br.monitoramento.motu.dto.FilialDepartamentoDto;
+
 
 @RestController
 @RequestMapping("/api/filiais")
 public class FilialDepartamentoController {
 
-    @Autowired
-    private FilialDepartamentoService filialDepartamentoService;
+    private final FilialDepartamentoService service;
 
-    @PostMapping
-    public ResponseEntity<FilialDepartamentoDTO> criarFilialDepartamento(@RequestBody FilialDepartamentoDTO dto) {
-        return ResponseEntity.ok(filialDepartamentoService.criarFilialDepartamento(dto));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<FilialDepartamentoDTO> obterFilialDepartamento(@PathVariable Long id) {
-        return ResponseEntity.ok(filialDepartamentoService.obterFilialDepartamento(id));
+    public FilialDepartamentoController(FilialDepartamentoService service) {
+        this.service = service;
     }
 
     @GetMapping
-    public ResponseEntity<List<FilialDepartamentoDTO>> listarFiliais() {
-        return ResponseEntity.ok(filialDepartamentoService.listarFiliais());
+    public List<FilialDepartamentoDto> getAll() {
+        return service.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public FilialDepartamentoDto getById(@PathVariable Long id) {
+        return service.findById(id);
+    }
+
+    @PostMapping
+    public ResponseEntity<FilialDepartamentoDto> create(@Valid @RequestBody FilialDepartamentoDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FilialDepartamentoDTO> atualizarFilialDepartamento(@PathVariable Long id, @RequestBody FilialDepartamentoDTO dto) {
-        return ResponseEntity.ok(filialDepartamentoService.atualizarFilialDepartamento(id, dto));
+    public FilialDepartamentoDto update(@PathVariable Long id, @Valid @RequestBody FilialDepartamentoDto dto) {
+        return service.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarFilialDepartamento(@PathVariable Long id) {
-        filialDepartamentoService.deletarFilialDepartamento(id);
-        return ResponseEntity.noContent().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
     }
 }
-

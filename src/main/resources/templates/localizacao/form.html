@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: header(#{view.localizacao.tituloForm})}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+
+<div class="container py-4">
+    <h1 class="h3 text-success mb-3" th:text="#{view.localizacao.tituloForm}">Cadastro de Localizacao</h1>
+
+    <form th:action="@{/view/localizacoes/save}" th:object="${localizacao}" method="post"
+          class="row g-3 bg-light p-3 rounded border">
+
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="col-md-3">
+            <label class="form-label" th:for="${#ids.next('idMoto')}" th:text="#{view.localizacao.idMoto}">Moto(ID)</label>
+            <input type="number" class="form-control" th:field="*{idMoto}" required min="1">
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label" th:for="${#ids.next('idSensor')}" th:text="#{view.localizacao.idSensor}">Sensor(ID)</label>
+            <input type="number" class="form-control" th:field="*{idSensor}" required min="1">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label" th:for="${#ids.next('data')}" th:text="#{view.localizacao.dataHora}">Data/Hora</label>
+            <!-- bind direto no campo 'data' do DTO -->
+            <input type="datetime-local" class="form-control" th:field="*{data}" required>
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+            <button type="submit" class="btn btn-success"
+                    th:text="${modoEdicao} ? #{view.salvar} : #{view.criar}">Salvar</button>
+            <a class="btn btn-outline-secondary" th:href="@{/view/localizacoes}" th:text="#{view.voltar}">Voltar</a>
+        </div>
+    </form>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>

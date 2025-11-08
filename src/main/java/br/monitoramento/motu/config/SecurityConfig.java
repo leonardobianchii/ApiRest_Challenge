@@ -21,11 +21,13 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
+        // viewer: so consulta
         var viewer = User.withUsername("viewer")
                 .password(encoder.encode("viewer123"))
                 .roles("MOTO_VIEW")
                 .build();
 
+        // editor: consulta + altera
         var editor = User.withUsername("editor")
                 .password(encoder.encode("editor123"))
                 .roles("MOTO_VIEW", "MOTO_EDIT")
@@ -35,41 +37,74 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http.authorizeHttpRequests(auth -> auth
-                // estáticos e login liberados
-                .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                // publico/estatico
+                .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
 
-                // telas do thymeleaf - Motos
-                .requestMatchers(HttpMethod.GET, "/motos/**").hasAnyRole("MOTO_VIEW", "MOTO_EDIT")
-                .requestMatchers(HttpMethod.POST, "/motos/**").hasRole("MOTO_EDIT")
-                .requestMatchers(HttpMethod.PUT, "/motos/**").hasRole("MOTO_EDIT")
-                .requestMatchers(HttpMethod.DELETE, "/motos/**").hasRole("MOTO_EDIT")
+                // ---------- listas (GET) liberadas para viewer e editor ----------
+                .requestMatchers(HttpMethod.GET,
+                        "/view/motos/**",
+                        "/view/sensores/**",
+                        "/view/localizacoes/**",
+                        "/view/filiais/**")
+                .hasAnyRole("MOTO_VIEW", "MOTO_EDIT")
 
+                // ---------- telas de edicao (GET /new e /{id}/edit) so pra editor ----------
+                .requestMatchers(HttpMethod.GET,
+                        "/view/motos/new", "/view/motos/*/edit",
+                        "/view/sensores/new", "/view/sensores/*/edit",
+                        "/view/localizacoes/new", "/view/localizacoes/*/edit",
+                        "/view/filiais/new", "/view/filiais/*/edit")
+                .hasRole("MOTO_EDIT")
+
+                // ---------- writes (POST/PUT/DELETE) so pra editor ----------
+                .requestMatchers(HttpMethod.POST,
+                        "/view/motos/**", "/view/sensores/**",
+                        "/view/localizacoes/**", "/view/filiais/**")
+                .hasRole("MOTO_EDIT")
+                .requestMatchers(HttpMethod.PUT,
+                        "/view/motos/**", "/view/sensores/**",
+                        "/view/localizacoes/**", "/view/filiais/**")
+                .hasRole("MOTO_EDIT")
+                .requestMatchers(HttpMethod.DELETE,
+                        "/view/motos/**", "/view/sensores/**",
+                        "/view/localizacoes/**", "/view/filiais/**")
+                .hasRole("MOTO_EDIT")
+
+                // o resto precisa estar logado
                 .anyRequest().authenticated()
-        )
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/motos", true)
-                        .failureUrl("/login?error=true")
-                        .permitAll()
-                )
+        );
 
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()
-                )
+        // login basico com thymeleaf
+        http.formLogin(login -> login
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/home", true)
+                .failureUrl("/login?error=true")
+                .permitAll()
+        );
 
-                .exceptionHandling(ex -> ex.accessDeniedPage("/403"))
+        // logout simples
+        http.logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+        );
 
-                .csrf(Customizer.withDefaults());
+        // quando falta permissao
+        http.exceptionHandling(ex -> ex.accessDeniedPage("/403"));
+
+        // csrf no padrao
+        http.csrf(Customizer.withDefaults());
 
         return http.build();
     }

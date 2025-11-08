@@ -1,7 +1,7 @@
 package br.monitoramento.motu.model;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
 @Table(name = "T_CM_MOTO")
@@ -9,39 +9,55 @@ public class Moto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idMoto;
+    @Column(name = "id_moto")
+    private Integer id;
 
-    @Column(name = "nm_modelo", nullable = false)
-    private String modelo;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_modelo", nullable = false)
+    private Modelo modelo;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "id_filial_departamento", nullable = false)
-    private FilialDepartamento filialDepartamento;
+    private FilialDepartamento filial;
 
     @NotBlank
-    @Column(name = "nm_placa", nullable = false, unique = true)
+    @Size(max = 10)
+    @Column(name = "nm_placa", nullable = false, unique = true, length = 10)
     private String placa;
 
-    @Column(name = "st_moto")
-    private String statusMoto;
+    @Size(max = 30)
+    @Column(name = "st_moto", length = 30)
+    private String status;
 
     @Column(name = "km_rodado")
     private Integer kmRodado;
 
-    public Long getIdMoto() {
-        return idMoto;
+    // =====================
+    // GETTERS e SETTERS
+    // =====================
+
+    public Integer getId() {
+        return id;
     }
 
-    public void setIdMoto(Long idMoto) {
-        this.idMoto = idMoto;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public FilialDepartamento getFilialDepartamento() {
-        return filialDepartamento;
+    public Modelo getModelo() {
+        return modelo;
     }
 
-    public void setFilialDepartamento(FilialDepartamento filialDepartamento) {
-        this.filialDepartamento = filialDepartamento;
+    public void setModelo(Modelo modelo) {
+        this.modelo = modelo;
+    }
+
+    public FilialDepartamento getFilial() {
+        return filial;
+    }
+
+    public void setFilial(FilialDepartamento filial) {
+        this.filial = filial;
     }
 
     public String getPlaca() {
@@ -52,12 +68,12 @@ public class Moto {
         this.placa = placa;
     }
 
-    public String getStatusMoto() {
-        return statusMoto;
+    public String getStatus() {
+        return status;
     }
 
-    public void setStatusMoto(String statusMoto) {
-        this.statusMoto = statusMoto;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Integer getKmRodado() {
@@ -66,13 +82,5 @@ public class Moto {
 
     public void setKmRodado(Integer kmRodado) {
         this.kmRodado = kmRodado;
-    }
-
-    public String getModelo() {
-        return modelo;
-    }
-
-    public void setModelo(String modelo) {
-        this.modelo = modelo;
     }
 }

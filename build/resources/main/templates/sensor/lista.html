@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: header(#{view.sensor.tituloLista})}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 text-success" th:text="#{view.sensor.tituloLista}">Lista de Sensores</h1>
+    <a class="btn btn-success" th:href="@{/view/sensores/new}" sec:authorize="hasRole('MOTO_EDIT')">
+      <i class="bi bi-plus-lg"></i> <span th:text="#{view.sensor.novo}">Novo Sensor</span>
+    </a>
+  </div>
+
+  <div th:if="${msgSucesso}" class="alert alert-success" th:text="#{__${msgSucesso}__}"></div>
+
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead class="table-success">
+      <tr>
+        <th th:text="#{view.sensor.id}">ID</th>
+        <th th:text="#{view.sensor.nome}">Nome</th>
+        <th th:text="#{view.sensor.filial}">Filial</th>
+        <th th:text="#{view.sensor.localizacao}">Localização</th>
+        <th th:text="#{view.acoes}" sec:authorize="hasRole('MOTO_EDIT')">Ações</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="s : ${sensores}">
+        <td th:text="${s.id}">1</td>
+        <td th:text="${s.nome}">Sensor A</td>
+        <td th:text="${s.idFilial}">1</td>
+        <td th:text="${s.localizacao}">Entrada</td>
+        <td class="d-flex gap-2" sec:authorize="hasRole('MOTO_EDIT')">
+          <a class="btn btn-sm btn-outline-success"
+             th:href="@{'/view/sensores/' + ${s.id} + '/edit'}"
+             th:text="#{view.editar}">Editar</a>
+          <form th:action="@{'/view/sensores/' + ${s.id} + '/delete'}" method="post"
+                th:attr="onsubmit=|return confirm('#{view.confirmarExclusao}')|">
+            <button class="btn btn-sm btn-outline-danger" type="submit" th:text="#{view.excluir}">Excluir</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+</body>
+</html>
