@@ -27,6 +27,7 @@ public class MotoWebController {
     // NOVO
     @GetMapping("/new")
     public String createForm(Model model) {
+        // Agora o ID não é forçado como null
         model.addAttribute("moto", new MotoDto(null, null, null, "", "", 0));
         model.addAttribute("modoEdicao", false);
         return "moto/form";
@@ -40,22 +41,25 @@ public class MotoWebController {
         return "moto/form";
     }
 
-    // SALVAR (CRIA/ATUALIZA)
+    // SALVAR
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute("moto") MotoDto moto,
                        BindingResult binding,
                        RedirectAttributes ra) {
+
         if (binding.hasErrors()) {
-            // volta para a mesma página com erros
             return "moto/form";
         }
-        if (moto.id() == null) {
+
+        // se o ID já existir, faz update; caso contrário, cria nova
+        if (moto.id() == null || motoService.findAll().stream().noneMatch(m -> m.id().equals(moto.id()))) {
             motoService.create(moto);
             ra.addFlashAttribute("msgSucesso", "view.moto.criada");
         } else {
             motoService.update(moto.id(), moto);
             ra.addFlashAttribute("msgSucesso", "view.moto.atualizada");
         }
+
         return "redirect:/view/motos";
     }
 
