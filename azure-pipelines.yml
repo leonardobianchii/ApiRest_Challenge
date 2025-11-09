@@ -1,0 +1,75 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  appName: 'rm558576mottuapp'
+  acrName: 'rm558576mottu'
+  acrLoginServer: 'rm558576mottu.azurecr.io'
+  imageRepository: 'fiap/$(appName)'
+  imageTag: '$(Build.BuildId)'
+  dockerRegistryServiceConnection: 'sc-acr-lorch'
+  azureSubscription: 'sc-azure-smartcheck'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  aciName: 'rm558576mottuaci'
+  resourceGroup: 'chal-mottu'
+  location: 'eastus'
+  containerPort: 8080
+
+steps:
+  - checkout: self
+
+  - task: Docker@2
+    displayName: 'Build and push image to ACR'
+    inputs:
+      command: buildAndPush
+      containerRegistry: '$(dockerRegistryServiceConnection)'
+      repository: '$(imageRepository)'
+      dockerfile: '$(dockerfilePath)'
+      tags: |
+        $(imageTag)
+      buildContext: '$(Build.SourcesDirectory)'
+
+  - task: AzureCLI@2
+    displayName: 'Deploy no Azure Container Instances'
+    inputs:
+      azureSubscription: '$(azureSubscription)'
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        set -euo pipefail
+        ACR_NAME='$(acrName)'
+        ACR_LOGIN_SERVER='$(acrLoginServer)'
+        IMAGE_NAME='$(imageRepository)'
+        TAG='$(imageTag)'
+        ACI_NAME='$(aciName)'
+        RESOURCE_GROUP='$(resourceGroup)'
+        LOCATION='$(location)'
+        PORT='$(containerPort)'
+
+        # Credenciais do ACR diretamente da conta (admin habilitado)
+        ACR_USER=$(az acr credential show -n "$ACR_NAME" --query username -o tsv)
+        ACR_PASS=$(az acr credential show -n "$ACR_NAME" --query "passwords[0].value" -o tsv)
+
+        # DNS label único por build para evitar conflito
+        DNS_LABEL="${ACI_NAME}-${BUILD_BUILDID}"
+
+        az container delete --name "$ACI_NAME" --resource-group "$RESOURCE_GROUP" --yes --only-show-errors || true
+
+        az container create \
+          --name "$ACI_NAME" \
+          --resource-group "$RESOURCE_GROUP" \
+          --location "$LOCATION" \
+          --image "$ACR_LOGIN_SERVER/$IMAGE_NAME:$TAG" \
+          --cpu 1 \
+          --memory 1.5 \
+          --dns-name-label "$DNS_LABEL" \
+          --ports "$PORT" \
+          --registry-login-server "$ACR_LOGIN_SERVER" \
+          --registry-username "$ACR_USER" \
+          --registry-password "$ACR_PASS" \
+          --os-type Linux
